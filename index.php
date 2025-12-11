@@ -1,3 +1,35 @@
+<?php
+session_start();
+
+// جمع الأخطاء من الجلسة
+$errors = [
+    "login" => $_SESSION['login'] ?? '',
+    "register" => $_SESSION['register_error'] ?? ''
+];
+
+// تحديد الفورم النشط
+$active_form = $_SESSION['active_form'] ?? 'login';
+
+// حذف رسائل الأخطاء فقط
+unset($_SESSION['login']);
+unset($_SESSION['register_error']);
+unset($_SESSION['active_form']);
+
+// دالة لعرض رسالة الخطأ
+function showError($error)
+{
+    return !empty($error) ? "<p class='error_message'>$error</p>" : '';
+}
+
+// دالة لتحديد الفورم النشط
+function isActiveForm($formName, $active_form)
+{
+    return $formName === $active_form ? 'active' : '';
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -39,19 +71,49 @@
       </form>
     </header>
 
-    <div class="login-form-container">
-      <i class="fas fa-times" id="form-close"></i>
-      <form action="">
-        <h3>Login</h3>
-        <input type="email" class="box" placeholder="enter your email" />
-        <input type="password" class="box" placeholder="enter your password" />
-        <input type="submit" value="login now" class="btn" />
+
+   
+<!-- Login Form -->
+<div class="login-form-container <?= isActiveForm('login', $active_form);?>" id="login-form">
+
+    <i class="fas fa-times" id="form-close"></i>
+    <form action="login_register.php" method="post"> 
+        <h3>Login</h3> 
+        <?= showError($errors['login']) ?>
+        <input type="email" class="box" name="email" placeholder="Email"> 
+        <input type="password" class="box" name="password" placeholder="Enter your password" required /> 
+        <input type="submit" value="Login now" class="btn" name="login" /> 
         <input type="checkbox" id="remember" />
-        <label for="remember">remember me</label>
-        <p>forget password? <a href="#">click here</a></p>
-        <p>don't have and account? <a href="#">register now</a></p>
-      </form>
-    </div>
+        <label for="remember">Remember me</label> 
+        <p>Forget password? <a href="#">Click here</a></p>
+        <p>Don't have an account? <a href="#" onclick="showForm('register-form')" id="register-link">Register now</a></p>
+    </form>
+</div>
+
+<!-- Register Form -->
+<div id="register-form" class="login-form-container <?= isActiveForm('register', $active_form);?>">
+    <form action="login_register.php" method="POST" class="register-box">
+        <h3>Create Account</h3>
+        <?= showError($errors['register']) ?>
+        <input type="text" name="name" class="box" placeholder="Full Name" required />
+        <input type="email" class="box" name="email" placeholder="Email" required />
+        <input type="password" class="box" name="password" placeholder="Password" required />
+        <select name="role" required>
+            <option value="">--Select Role--</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select>
+        <br>
+        <label style="font-size: 1.5rem">Upload Profile Photo</label>
+        <input type="file" name="photo" class="box" required />
+        <input type="submit" name="register" value="Register Now" class="btn" />
+        <p>Already have an account? <a href="#" onclick="showForm('login-form')">Login here</a></p>
+    </form>
+</div>
+
+
+
+
 
     <section class="home" id="home">
       <div class="content">
@@ -92,7 +154,7 @@
           <img src="images/book-img.jpg" alt="">
         </div>
 
-        <form action="">
+        <form action="#">
           <div class="inputBox">
             <h3>where to</h3>
             <input type="text" placeholder="place name">
@@ -109,7 +171,7 @@
             <h3>leaving</h3>
             <input type="text" placeholder="place name">
           </div>
-          <input type="submit" class="btn"vvalue="book now">
+          <input type="submit" class="btn" value="book now">
         </form>
       </div>
 
@@ -245,9 +307,8 @@
     </section>
 
 
-    <section class="services" id="services">
-
-      <h1 class="heading">
+  <section class="services" id="services">
+    <h1 class="heading">
         <span>s</span>
         <span>e</span>
         <span>r</span>
@@ -256,57 +317,46 @@
         <span>c</span>
         <span>e</span>
         <span>s</span>
-      </h1>
+    </h1>
 
-      <div class="box-container">
-        <div  class="box">
-          <i class="fas fa-hotel"></i>
-          <h3>affordable hotels</h3>
-          <p>We offer budget-friendly hotels with great comfort and excellent service, ensuring you enjoy your stay without overspending</p>
+    <div class="box-container">
+        <div class="box">
+            <i class="fas fa-hotel"></i>
+            <h3>affordable hotels</h3>
+            <p>We offer budget-friendly hotels with great comfort and excellent service, ensuring you enjoy your stay without overspending</p>
         </div>
 
-
-        <div  class="box">
-          <i class="fas fa-utensils"></i>
-          <h3>food and drinks</h3>
-          <p>Taste delicious local and international dishes, with carefully selected restaurants and cafés to make your trip unforgettable.</p>
+        <div class="box">
+            <i class="fas fa-utensils"></i>
+            <h3>food and drinks</h3>
+            <p>Taste delicious local and international dishes, with carefully selected restaurants and cafés to make your trip unforgettable.</p>
         </div>
 
-
-           <div  class="box">
-          <i class="fas fa-bullhorn"></i>
-          <h3>safty guide</h3>
-          <p>Your safety is our priority. Our professional guides ensure a secure, smooth, and well-organized travel experience</p>
+        <div class="box">
+            <i class="fas fa-bullhorn"></i>
+            <h3>safety guide</h3>
+            <p>Your safety is our priority. Our professional guides ensure a secure, smooth, and well-organized travel experience</p>
         </div>
 
-
-
-           <div  class="box">
-          <i class="fas fa-globe-asia"></i>
-          <h3>around the world</h3>
-          <p>Explore top destinations worldwide with customized travel packages designed to match your interests and budget</p>
+        <div class="box">
+            <i class="fas fa-globe-asia"></i>
+            <h3>around the world</h3>
+            <p>Explore top destinations worldwide with customized travel packages designed to match your interests and budget</p>
         </div>
 
-
-
-          <div  class="box">
-          <i class="fas fa-plane"></i>
-          <h3>fastest travel</h3>
-          <p>Enjoy quick and hassle-free travel options, from transportation arrangements to fast booking services</p>
+        <div class="box">
+            <i class="fas fa-plane"></i>
+            <h3>fastest travel</h3>
+            <p>Enjoy quick and hassle-free travel options, from transportation arrangements to fast booking services</p>
         </div>
 
-
-
-        <div  class="box">
-          <i class="fas fa-hiking"></i>
-          <h3>adventuresk</h3>
-          <p>Experience exciting adventures, from hiking and sightseeing to unique cultural activities tailored for thrill-seekers</p>
+        <div class="box">
+            <i class="fas fa-hiking"></i>
+            <h3>adventures</h3>
+            <p>Experience exciting adventures, from hiking and sightseeing to unique cultural activities tailored for thrill-seekers</p>
         </div>
-      </div>
-
-      </div>
-
-    </section>
+    </div>
+</section>
 
 
     <section class="gallery" id="gallery">
@@ -498,7 +548,7 @@
       </h1>
       <div class="row">
         <div class="image">
-          <img src="images/contact-img.jpg" alt"">
+          <img src="images/contact-img.jpg" alt="">
         </div>
         <form action="">
           <div class="inputBox">
@@ -548,7 +598,7 @@
     </div>
   </div>
 
-  <h1 class="credit">created by <span>Created by: Sewar, Aya, and Jumana.</span></h1>
+  <h1 class="credit"> <span>Created by: Sewar, Aya, and Jumana.</span></h1>
 </section>
 
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>

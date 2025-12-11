@@ -33,32 +33,55 @@ formClose.addEventListener("click", () => {
   loginForm.classList.remove("active");
 });
 
-videoBtn.forEach(btn =>{
-  btn.addEventListener('click',()=>{
-  document.querySelector('.controls .active').classList.remove('active');
-  btn.classList.add('active');
-  let src=btn.getAttribute('data-src')
-  document.querySelector('#video-slider').src=src;
+videoBtn.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelector(".controls .active").classList.remove("active");
+    btn.classList.add("active");
+    let src = btn.getAttribute("data-src");
+    document.querySelector("#video-slider").src = src;
   });
 });
 
 var swiper = new Swiper(".review-slider", {
-    spaceBetween: 20,
-    loop: true,
-    autoplay: {
-        delay: 2500,
-        disableOnInteraction: false,
+  spaceBetween: 20,
+  loop: true,
+  autoplay: {
+    delay: 2500,
+    disableOnInteraction: false,
+  },
+  breakpoints: {
+    640: {
+      slidesPerView: 1,
     },
-    breakpoints: {
-        640: {
-            slidesPerView: 1,
-        },
-        768: {
-            slidesPerView: 2,
-        },
-        1024: {
-            slidesPerView: 3,
-        },
+    768: {
+      slidesPerView: 2,
     },
+    1024: {
+      slidesPerView: 3,
+    },
+  },
 });
 
+function showForm(formId) {
+  document
+    .querySelectorAll(".login-form-container")
+    .forEach((form) => form.classList.remove("active"));
+  document.getElementById(formId).classList.add("active");
+}
+
+document.getElementById("loginForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  let formData = new FormData(this);
+  fetch("backend/login.php", { method: "POST", body: formData })
+    .then((res) => res.text())
+    .then((result) => {
+      result = result.trim();
+      if (result === "go_admin") {
+        window.location.href = "admin.php";
+      } else if (result === "go_user") {
+        window.location.href = "index.php";
+      } else {
+        alert("Invalid email or password");
+      }
+    });
+});
