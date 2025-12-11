@@ -68,20 +68,3 @@ function showForm(formId) {
     .forEach((form) => form.classList.remove("active"));
   document.getElementById(formId).classList.add("active");
 }
-
-document.getElementById("loginForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-  let formData = new FormData(this);
-  fetch("backend/login.php", { method: "POST", body: formData })
-    .then((res) => res.text())
-    .then((result) => {
-      result = result.trim();
-      if (result === "go_admin") {
-        window.location.href = "admin.php";
-      } else if (result === "go_user") {
-        window.location.href = "index.php";
-      } else {
-        alert("Invalid email or password");
-      }
-    });
-});

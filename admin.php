@@ -1,10 +1,9 @@
 <?php
-session_start();
-
-if(!isset($_SESSION['email'])){
+if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
     header("Location: index.php");
     exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +67,7 @@ if(!isset($_SESSION['email'])){
 
     <script>
         function loadUsers() {
-            fetch("backend/admin_actions.php", {
+            fetch("admin_actions.php", {
                 method: "POST",
                 body: new URLSearchParams({ action: "getUsers" })
             })

@@ -1,14 +1,9 @@
 <?php
-include "connect.php";
 session_start();
-
-// Only admin can access
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    echo "not allowed";
-    exit;
-}
+include "db.php";
 
 $action = $_POST['action'] ?? null;
+
 
 
 // ------------------------
