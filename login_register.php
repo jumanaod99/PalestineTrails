@@ -17,8 +17,8 @@ if (isset($_POST['register'])) {
     $checkemail = $conn->query("SELECT email FROM users WHERE email='$email'");
 
     if ($checkemail->num_rows > 0) {
-        $_SESSION["register_error"] = "Email is already registered!";
-        $_SESSION["active-form"] = "register";
+        $_SESSION['register_error'] = 'Email is already registered!';
+        $_SESSION['active_form'] = 'register';
     } else {
         move_uploaded_file($tmp, $uploadPath);
         $conn->query("INSERT INTO users (name, email, password, role, photo) 
@@ -44,26 +44,22 @@ if (isset($_POST['login'])) {
         $user = $result->fetch_assoc();
 
         if (password_verify($password, $user['password'])) {
-
             $_SESSION['name'] = $user['name'];
             $_SESSION['email'] = $user['email'];
 
-            if ($user['role'] == 'admin') {
+            if ($user['role'] === 'admin') {
                 header("Location: admin.php");
             } else {
                 header("Location: index.php");
                 
-            }exit();
+            }
+            exit();
 
         }  
     }
-            $_SESSION["login_error"] = "Incorrect email or password";
-            $_SESSION["active_form"]  = 'login';
+            $_SESSION['login_error'] = 'Incorrect email or password';
+            $_SESSION['active_form']  = 'login';
             header("Location: index.php");
             exit();
-        
-
-     
-
 }
 ?>

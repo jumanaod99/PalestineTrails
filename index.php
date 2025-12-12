@@ -3,28 +3,25 @@ session_start();
 
 // جمع الأخطاء من الجلسة
 $errors = [
-    "login" => $_SESSION['login'] ?? '',
-    "register" => $_SESSION['register_error'] ?? ''
+    'login' => $_SESSION['login_error'] ?? '',
+    'register' => $_SESSION['register_error'] ?? ''
 ];
 
 // تحديد الفورم النشط
-$active_form = $_SESSION['active_form'] ?? 'login';
+$activeForm = $_SESSION['active_form'] ?? 'login';
 
-// حذف رسائل الأخطاء فقط
-unset($_SESSION['login']);
-unset($_SESSION['register_error']);
-unset($_SESSION['active_form']);
+session_unset();
 
-// دالة لعرض رسالة الخطأ
+
 function showError($error)
 {
-    return !empty($error) ? "<p class='error_message'>$error</p>" : '';
+    return !empty($error) ? "<p class='error-message'>$error</p>" : '';
 }
 
 // دالة لتحديد الفورم النشط
-function isActiveForm($formName, $active_form)
+function isActiveForm($formName, $activeForm)
 {
-    return $formName === $active_form ? 'active' : '';
+    return $formName === $activeForm ? 'active' : '';
 }
 ?>
 
@@ -74,7 +71,7 @@ function isActiveForm($formName, $active_form)
 
    
 <!-- Login Form -->
-<div class="login-form-container <?= isActiveForm('login', $active_form);?>" id="login-form">
+<div class="login-form-container <?= isActiveForm('login', $activeForm);?>" id="login-form">
 
     <i class="fas fa-times" id="form-close"></i>
     <form action="login_register.php" method="post"> 
@@ -91,8 +88,8 @@ function isActiveForm($formName, $active_form)
 </div>
 
 <!-- Register Form -->
-<div id="register-form" class="login-form-container <?= isActiveForm('register', $active_form);?>">
-    <form action="login_register.php" method="POST" class="register-box">
+<div id="register-form" class="login-form-container <?= isActiveForm('register', $activeForm);?>">
+    <form action="login_register.php" method="post" class="register-box">
         <h3>Create Account</h3>
         <?= showError($errors['register']) ?>
         <input type="text" name="name" class="box" placeholder="Full Name" required />
@@ -104,7 +101,7 @@ function isActiveForm($formName, $active_form)
             <option value="admin">Admin</option>
         </select>
         <br>
-        <label style="font-size: 1.5rem">Upload Profile Photo</label>
+        <label style="font-size: 1.5rem" enctype="multipart/form-data">Upload Profile Photo</label>
         <input type="file" name="photo" class="box" required />
         <input type="submit" name="register" value="Register Now" class="btn" />
         <p>Already have an account? <a href="#" onclick="showForm('login-form')">Login here</a></p>
