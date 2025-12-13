@@ -374,7 +374,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Bahá’í Gardens</h3>
             <p>The Bahá’í Gardens are among the most beautiful gardens in the world, featuring stunning terraces and a breathtaking view of Haifa Bay</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
@@ -384,7 +383,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Hisham’s Palace</h3>
             <p>Hisham’s Palace is a remarkable archaeological site from the Umayyad era, known for its stunning mosaics and rich history</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
@@ -394,7 +392,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Mount of Precipice</h3>
             <p>Mount of Precipice offers a breathtaking panoramic view of Nazareth and the surrounding valleys</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
@@ -404,7 +401,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Wadi Qelt</h3>
             <p>Wadi Qelt is a stunning natural valley featuring scenic landscapes, hiking trails, and an ancient monastery nestled between the cliffs</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
@@ -414,7 +410,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Jericho Cable Car</h3>
             <p>The Jericho Cable Car offers a unique ride from the base of the mountain to the Monastery of Temptation with a stunning view.</p>
-            <a href="#" class="btn">See More</a>
         
           </div>
         </div>
@@ -425,7 +420,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Jerusalem Old City</h3>
             <p>Narrow streets and traditional markets full of history and culture</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
@@ -435,7 +429,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Sea of Galilee</h3>
             <p>A scenic lake surrounded by mountains and resorts</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
@@ -445,7 +438,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Tell es-Sultan</h3>
             <p>An ancient archaeological site considered one of the world’s oldest cities</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
@@ -455,7 +447,6 @@ function isActiveForm($formName, $activeForm)
           <div class="content">
             <h3>Al-Aqsa Mosque</h3>
             <p>One of the most significant religious landmarks with iconic architecture</p>
-            <a href="#" class="btn">See More</a>
           </div>
         </div>
 
