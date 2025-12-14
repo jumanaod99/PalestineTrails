@@ -1,10 +1,8 @@
 <?php
 session_start();
-include "db.php";
+require_once"db.php";
 
 $action = $_POST['action'] ?? null;
-
-
 
 // ------------------------
 // 1) Get all users

@@ -203,7 +203,7 @@ function isActiveForm($formName, $activeForm)
 
             </div>
           <div class="price"> ₪90 <span>₪120</span> </div>
-          <a href="#" class="btn"> book now</a>
+          <a href="#book" class="btn"> book now</a>
         </div>
        </div>
 
@@ -221,7 +221,7 @@ function isActiveForm($formName, $activeForm)
 
             </div>
           <div class="price">  ₪90 <span>₪120</span></div>
-          <a href="#" class="btn"> book now</a>
+          <a href="#book" class="btn"> book now</a>
         </div>
         </div>
 
@@ -239,7 +239,7 @@ function isActiveForm($formName, $activeForm)
 
             </div>
           <div class="price">  ₪90 <span>₪120</span> </div>
-          <a href="#" class="btn"> book now</a>
+          <a href="#book" class="btn"> book now</a>
         </div>
         </div>
 
@@ -258,7 +258,7 @@ function isActiveForm($formName, $activeForm)
 
             </div>
           <div class="price">  ₪90 <span>₪120</span> </div>
-          <a href="#" class="btn"> book now</a>
+          <a href="#book" class="btn"> book now</a>
         </div>
         </div>
 
@@ -277,7 +277,7 @@ function isActiveForm($formName, $activeForm)
 
             </div>
           <div class="price">  ₪90 <span>₪120</span> </div>
-          <a href="#" class="btn"> book now</a>
+          <a href="#book" class="btn"> book now</a>
         </div>
         </div>
 
@@ -297,7 +297,7 @@ function isActiveForm($formName, $activeForm)
 
             </div>
           <div class="price">  ₪90 <span>₪120</span> </div>
-          <a href="#" class="btn"> book now</a>
+          <a href="#book" class="btn"> book now</a>
         </div>
        </div>
 
