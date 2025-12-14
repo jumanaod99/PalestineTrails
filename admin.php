@@ -96,6 +96,8 @@ if (!isset($_SESSION['email'])) {
 
     <input type="text" id="editName" placeholder="Name">
     <input type="email" id="editEmail" placeholder="Email">
+    <input type="file" id="editPhoto" accept="image/*">
+
 
     <select id="editRole">
         <option value="user">User</option>
@@ -149,12 +151,14 @@ function deleteUser(id) {
 
 /* OPEN EDIT */
 function openEdit(id, name, email, role) {
-    document.getElementById("editId").value = id;
-    document.getElementById("editName").value = name;
-    document.getElementById("editEmail").value = email;
-    document.getElementById("editRole").value = role;
-    document.getElementById("editBox").style.display = "block";
+    editId.value = id;
+    editName.value = name;
+    editEmail.value = email;
+    editRole.value = role;
+    editPhoto.value = "";   // 👈 مهم
+    editBox.style.display = "block";
 }
+
 
 /* CLOSE EDIT */
 function closeEdit() {
@@ -163,23 +167,28 @@ function closeEdit() {
 
 /* SAVE EDIT */
 function saveEdit() {
-    let id = editId.value;
-    let name = editName.value;
-    let email = editEmail.value;
-    let role = editRole.value;
+
+    let formData = new FormData();
+    formData.append("action", "updateUser");
+    formData.append("id", editId.value);
+    formData.append("name", editName.value);
+    formData.append("email", editEmail.value);
+    formData.append("role", editRole.value);
+
+    if (editPhoto.files.length > 0) {
+        formData.append("photo", editPhoto.files[0]);
+    }
 
     fetch("admin_actions.php", {
         method: "POST",
-        body: new URLSearchParams({
-            action: "updateUser",
-            id, name, email, role
-        })
+        body: formData
     })
     .then(() => {
         closeEdit();
         loadUsers();
     });
 }
+
 
 /* CHANGE PASSWORD */
 function changePw(id) {

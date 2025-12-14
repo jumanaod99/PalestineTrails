@@ -67,18 +67,29 @@ if ($action === "addUser") {
 // ------------------------
 // 4) Update User
 // ------------------------
-if ($action === "updateUser") {
+if ($_POST['action'] == 'updateUser') {
 
-    $id    = $_POST['id'];
-    $name  = $_POST['name'];
+    $id = $_POST['id'];
+    $name = $_POST['name'];
     $email = $_POST['email'];
-    $role  = $_POST['role'];
+    $role = $_POST['role'];
 
-    mysqli_query($conn, "UPDATE users SET name='$name', email='$email', role='$role' WHERE id='$id'");
+    if (!empty($_FILES['photo']['name'])) {
 
-    echo "updated";
+        $imgName = time() . "_" . $_FILES['photo']['name'];
+        move_uploaded_file($_FILES['photo']['tmp_name'], "images/" . $imgName);
+
+        $stmt = $conn->prepare("UPDATE users SET name=?, email=?, role=?, photo=? WHERE id=?");
+        $stmt->execute([$name, $email, $role, $imgName, $id]);
+
+    } else {
+        $stmt = $conn->prepare("UPDATE users SET name=?, email=?, role=? WHERE id=?");
+        $stmt->execute([$name, $email, $role, $id]);
+    }
+
     exit;
 }
+
 
 
 // ------------------------
