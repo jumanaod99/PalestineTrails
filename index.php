@@ -8,7 +8,7 @@ $errors = [
 ];
 
 // تحديد الفورم النشط
-$activeForm = $_SESSION['active_form'] ?? 'login';
+$activeForm = $_SESSION['active_form'] ?? '';
 
 session_unset();
 
