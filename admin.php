@@ -1,60 +1,132 @@
 <?php
 session_start();
+require_once "db.php";
 
-if (!isset($_SESSION['email'])) {
-    header("Location: index.php");
+if (!isset($_SESSION['email']))
+     { header("Location: index.php");
+         exit();
+         }
+
+$uploadDir = "uploads/";
+$message = '';
+
+/* التأكد من وجود مجلد uploads */
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0777, true);
+}
+
+/* ==== معالجة النماذج ==== */
+
+/* ADD USER */
+if(isset($_POST['action']) && $_POST['action'] === 'addUser') {
+    $name  = $_POST['name'];
+    $email = $_POST['email'];
+    $pw    = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $role  = $_POST['role'];
+
+    $photo = '';
+    if(isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
+        $photo = time() . '_' . $_FILES['photo']['name'];
+        move_uploaded_file($_FILES['photo']['tmp_name'], $uploadDir . $photo);
+    }
+
+    $conn->query("INSERT INTO users (name,email,password,role,photo)
+                  VALUES ('$name','$email','$pw','$role','$photo')");
+    $message = "User added successfully";
+     header("Location: admin.php");
     exit();
 }
+
+/* EDIT USER */
+if(isset($_POST['action']) && $_POST['action'] === 'editUser') {
+    $id    = $_POST['id'];
+    $name  = $_POST['name'];
+    $email = $_POST['email'];
+    $role  = $_POST['role'];
+
+    $sql = "UPDATE users SET name='$name', email='$email', role='$role'";
+
+    if(isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
+        $photo = time() . '_' . $_FILES['photo']['name'];
+        move_uploaded_file($_FILES['photo']['tmp_name'], $uploadDir . $photo);
+        $sql .= ", photo='$photo'";
+    }
+
+    $sql .= " WHERE id=$id";
+    $conn->query($sql);
+    $message = "User updated successfully";
+     header("Location: admin.php");
+    exit();
+}
+
+/* DELETE USER */
+if(isset($_POST['action']) && $_POST['action'] === 'deleteUser') {
+    $id = $_POST['id'];
+    $conn->query("DELETE FROM users WHERE id=$id");
+    $message = "User deleted successfully";
+     header("Location: admin.php");
+    exit();
+}
+
+/* CHANGE PASSWORD */
+if(isset($_POST['action']) && $_POST['action'] === 'changePassword') {
+    $id = $_POST['id'];
+    $pw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $conn->query("UPDATE users SET password='$pw' WHERE id=$id");
+    $message = "Password changed successfully";
+     header("Location: admin.php");
+    exit();
+}
+
+/* ==== جلب المستخدمين ==== */
+$users = $conn->query("SELECT * FROM users");
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
 
-    <style>
-        html, body { height: auto; overflow-x: hidden; }
-        body {
-            background: #f7f7f7;
-            padding: 2rem 0;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .edit-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            padding: 3rem;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,.3);
-            display: none;
-            z-index: 999;
-            width: 400px;
-        }
-
-        .edit-box input,
-        .edit-box select {
-            width: 100%;
-            margin-bottom: 1rem;
-            padding: 1rem;
-             font-size: 2rem;   
-        }
-    </style>
+html, body { height: auto; overflow-x: hidden; } 
+body { background: #f7f7f7;
+     padding: 2rem 0;
+      min-height: 100vh;
+       margin: 0; }
+.edit-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 15px rgba(0,0,0,.3);
+    display: none;
+    z-index: 999;
+    width: 400px;
+}
+.edit-box input, .edit-box select {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    font-size: 1.6rem;
+}
+</style>
 </head>
-
 <body>
 
 <div class="admin-container">
 
     <h2>Admin Dashboard</h2>
 
-    <h3 style="font-size:2rem;margin-bottom:1rem;">Users List</h3>
+    <?php if($message) echo "<div class='msg'>$message</div>"; ?>
 
-    <table id="usersTable">
+    <!-- USERS TABLE -->
+    <h3 style="font-size:2rem;margin-bottom:1rem;">Users List</h3>
+    <table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -65,162 +137,96 @@ if (!isset($_SESSION['email'])) {
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+        <?php while ($u = $users->fetch_assoc()) { ?>
+            <tr>
+                <td><?= $u['id'] ?></td>
+                <td><img src="uploads/<?= $u['photo'] ?: 'default.png' ?>" alt="User Photo"></td>
+                <td><?= $u['name'] ?></td>
+                <td><?= $u['email'] ?></td>
+                <td><?= $u['role'] ?></td>
+                <td>
+                    <button class="btn-admin" onclick="openEditModal(<?= $u['id'] ?>,'<?= htmlspecialchars($u['name'],ENT_QUOTES) ?>','<?= htmlspecialchars($u['email'],ENT_QUOTES) ?>','<?= $u['role'] ?>')">Edit</button>
+
+                    <form action="" method="post" style="display:inline;" onsubmit="return confirm('Delete this user?');">
+                        <input type="hidden" name="action" value="deleteUser">
+                        <input type="hidden" name="id" value="<?= $u['id'] ?>">
+                        <button type="submit" class="btn-admin">Delete</button>
+                    </form>
+
+                    <form action="" method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="changePassword">
+                        <input type="hidden" name="id" value="<?= $u['id'] ?>">
+                        <input type="password" name="password" placeholder="New Password" class="box" required>
+                        <button type="submit" class="btn-admin">Change</button>
+                    </form>
+                </td>
+            </tr>
+        <?php } ?>
+        </tbody>
     </table>
 
+    <!-- ADD USER -->
     <h3 style="font-size:2rem;margin:2rem 0 1rem;">Add New User</h3>
+    <form action="" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="addUser">
 
-    <form id="addUserForm">
         <div class="input-row">
-            <input type="text" name="name" class="box" placeholder="Full Name" required>
-            <input type="email" name="email" class="box" placeholder="Email" required>
+            <input type="text" name="name" placeholder="Full Name" class="box" required>
+            <input type="email" name="email" placeholder="Email" class="box" required>
         </div>
 
         <div class="input-row">
-            <input type="password" name="password" class="box" placeholder="Password" required>
+            <input type="password" name="password" placeholder="Password" class="box" required>
             <select name="role" class="box">
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
             </select>
-        </div>
+       
 
-        <button class="btn-admin">Add User</button>
+        <label>Profile Photo</label>
+        <input type="file" name="photo" class="box" required>
+         </div>
+
+        <button type="submit" class="btn-admin">Add User</button>
     </form>
+
 </div>
 
 <!-- EDIT MODAL -->
 <div id="editBox" class="edit-box">
     <h3>Edit User</h3>
+    <form action="" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="editUser">
+        <input type="hidden" id="editId" name="id">
 
-    <input type="hidden" id="editId">
+        <input type="text" id="editName" name="name" placeholder="Name" required>
+        <input type="email" id="editEmail" name="email" placeholder="Email" required>
+        <select id="editRole" name="role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select>
+        <label>Profile Photo</label>
+        <input type="file" id="editPhoto" name="photo" accept="image/*">
 
-    <input type="text" id="editName" placeholder="Name">
-    <input type="email" id="editEmail" placeholder="Email">
-    <input type="file" id="editPhoto" accept="image/*">
-
-
-    <select id="editRole">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-    </select>
-
-    <button class="btn-admin" onclick="saveEdit()">Save</button>
-    <button class="btn-admin" onclick="closeEdit()">Cancel</button>
+        <button type="submit" class="btn-admin">Save</button>
+        <button type="button" class="btn-admin" onclick="closeEditModal()">Cancel</button>
+    </form>
 </div>
 
 <script>
-/* LOAD USERS */
-function loadUsers() {
-    fetch("admin_actions.php", {
-        method: "POST",
-        body: new URLSearchParams({ action: "getUsers" })
-    })
-    .then(res => res.json())
-    .then(data => {
-        let tbody = document.querySelector("#usersTable tbody");
-        tbody.innerHTML = "";
-
-        data.forEach(u => {
-            tbody.innerHTML += `
-            <tr>
-                <td>${u.id}</td>
-                <td><img src="${u.photo ? u.photo : 'images/default.png'}" width="40"></td>
-                <td>${u.name}</td>
-                <td>${u.email}</td>
-                <td>${u.role}</td>
-                <td>
-                    <button class="btn-admin" onclick="openEdit(${u.id}, '${u.name}', '${u.email}', '${u.role}')">Edit</button>
-                    <button class="btn-admin" onclick="deleteUser(${u.id})">Delete</button>
-                    <button class="btn-admin" onclick="changePw(${u.id})">Password</button>
-                </td>
-            </tr>`;
-        });
-    });
-}
-loadUsers();
-
-/* DELETE */
-function deleteUser(id) {
-    if (!confirm("Delete this user?")) return;
-
-    fetch("admin_actions.php", {
-        method: "POST",
-        body: new URLSearchParams({ action: "deleteUser", id })
-    }).then(() => loadUsers());
+function openEditModal(id, name, email, role) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editName').value = name;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editRole').value = role;
+    document.getElementById('editPhoto').value = '';
+    document.getElementById('editBox').style.display = 'block';
 }
 
-/* OPEN EDIT */
-function openEdit(id, name, email, role) {
-    editId.value = id;
-    editName.value = name;
-    editEmail.value = email;
-    editRole.value = role;
-    editPhoto.value = "";   // 👈 مهم
-    editBox.style.display = "block";
+function closeEditModal() {
+    document.getElementById('editBox').style.display = 'none';
 }
-
-
-/* CLOSE EDIT */
-function closeEdit() {
-    document.getElementById("editBox").style.display = "none";
-}
-
-/* SAVE EDIT */
-function saveEdit() {
-
-    let formData = new FormData();
-    formData.append("action", "updateUser");
-    formData.append("id", editId.value);
-    formData.append("name", editName.value);
-    formData.append("email", editEmail.value);
-    formData.append("role", editRole.value);
-
-    if (editPhoto.files.length > 0) {
-        formData.append("photo", editPhoto.files[0]);
-    }
-
-    fetch("admin_actions.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(() => {
-        closeEdit();
-        loadUsers();
-    });
-}
-
-
-/* CHANGE PASSWORD */
-function changePw(id) {
-    let pw = prompt("New password:");
-    if (!pw) return;
-
-    fetch("admin_actions.php", {
-        method: "POST",
-        body: new URLSearchParams({
-            action: "changePassword",
-            id,
-            password: pw
-        })
-    }).then(() => alert("Password updated"));
-}
-
-/* ADD USER */
-document.getElementById("addUserForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    let formData = new FormData(this);
-    formData.append("action", "addUser");
-
-    fetch("admin_actions.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(() => {
-        this.reset();
-        loadUsers();
-    });
-});
 </script>
 
 </body>
